@@ -13,16 +13,16 @@ on:
     branches: ["main"]
 
 jobs:
-  build-and-push:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - name: Login to Registry
-      run: echo "${{ env.QUAYIO_PASSWORD }}" | docker login quay.io -u ${{ env.QUAYIO_USER }} --password-stdin
-    - name: Build the Docker image
-      run: docker build -t ${{ env.IMAGE_REPOSITORY }}:${{ env.TAGS }} .
-    - name: Store Image to Registry
-      run: docker push ${{ env.IMAGE_REPOSITORY }}:${{ env.TAGS }}
+  # build-and-push:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - uses: actions/checkout@v4
+  #   - name: Login to Registry
+  #     run: echo "${{ env.QUAYIO_PASSWORD }}" | docker login quay.io -u ${{ env.QUAYIO_USER }} --password-stdin
+  #   - name: Build the Docker image
+  #     run: docker build -t ${{ env.IMAGE_REPOSITORY }}:${{ env.TAGS }} 
+  #   - name: Store Image to Registry
+  #     run: docker push ${{ env.IMAGE_REPOSITORY }}:${{ env.TAGS }}
 
   deploy-k8s:
     runs-on: ubuntu-latest
@@ -35,14 +35,16 @@ jobs:
         mkdir -p ${HOME}/.kube
         echo ${{ env.KUBE_CONFIG }} | base64 --decode > ${HOME}/.kube/config
         cat ${HOME}/.kube/config
-    - name: Update env variables
-      run: kubectl set env deployment/frontend-nextjs NEXT_PUBLIC_BACKEND_URL=${{ env.BACKEND_URL }}
-    - name: Apply k8s yml file for Deployment
-      run: kubectl apply -f frontend-kubernetes.yml
-    - name: Access the Endpoint when app ready
-      run: |
-        echo "================== Access The App ==================="
-        echo ""
-        echo "URL = https://$(kubectl get ingress frontend-nextjs-ingress -o jsonpath='{.spec.rules[0].host}')"
-        echo ""
-        echo "====================================================="
+    - name: kubectl checking
+      run: kubectl --help
+    # - name: Update env variables
+#   run: kubectl set env deployment/frontend-nextjs NEXT_PUBLIC_BACKEND_URL=${{ env.BACKEND_URL }}
+# - name: Apply k8s yml file for Deployment
+#   run: kubectl apply -f frontend-kubernetes.yml
+# - name: Access the Endpoint when app ready
+#   run: |
+#     echo "================== Access The App ==================="
+#     echo ""
+#     echo "URL = https://$(kubectl get ingress frontend-nextjs-ingress -o jsonpath='{.spec.rules[0].host}')"
+#     echo ""
+#     echo "====================================================="
