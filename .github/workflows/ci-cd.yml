@@ -31,10 +31,7 @@ jobs:
     - name: checkout-github-repo
       uses: actions/checkout@v4
     - name: create kubeconfig
-      run: |
-        echo  ${HOME}
-        mkdir ${HOME}/.kube
-        # echo ${{ env.KUBE_CONFIG }} | base64 -d > ${HOME}/.kube/config
+      run: "echo  ${HOME}\necho \"my homedir --> ${HOME}, now i'm here --> $(pwd)\"\necho ${{ env.KUBE_CONFIG }} | base64 -d \n"
     - name: kubectl checking
       run: kubectl --help
     # - name: Update env variables
