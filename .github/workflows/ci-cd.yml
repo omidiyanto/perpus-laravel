@@ -32,8 +32,8 @@ jobs:
       uses: actions/checkout@v4
     - name: create kubeconfig
       run: |
-        base64 --help
-        mkdir -p ${HOME}/.kube
+        echo  ${HOME}
+        mkdir ${HOME}/.kube
         # echo ${{ env.KUBE_CONFIG }} | base64 -d > ${HOME}/.kube/config
     - name: kubectl checking
       run: kubectl --help
