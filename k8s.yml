@@ -1,34 +1,8 @@
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: mysql-data-pv
-spec:
-  capacity:
-    storage: 1Gi
-  accessModes:
-  - ReadWriteOnce
-  hostPath:
-    path: /data/mysql-data
-
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: mysql-data
-spec:
-  accessModes:
-  - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
-
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mysql
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: mysql
@@ -40,23 +14,13 @@ spec:
       containers:
       - name: mysql
         image: mysql:5.7
-        ports:
-        - containerPort: 3306
         env:
-        - name: MYSQL_USER
-          value: root
         - name: MYSQL_ROOT_PASSWORD
           value: root
         - name: MYSQL_DATABASE
           value: perpusku_gc
-        volumeMounts:
-        - mountPath: /var/lib/mysql/data
-          name: mysql-data
-      volumes:
-      - name: mysql-data
-        persistentVolumeClaim:
-          claimName: mysql-data
-
+        ports:
+        - containerPort: 3306
 ---
 apiVersion: v1
 kind: Service
@@ -87,7 +51,7 @@ spec:
       restartPolicy: Always
       containers:
       - name: perpus-laravel
-        image: quay.io/omidiyanto
+        image: quay.io/omidiyanto/perpus-laravel:latest
         imagePullPolicy: Always
         env:
         - name: DB_CONNECTION
@@ -98,12 +62,11 @@ spec:
           value: "3306"
         - name: DB_DATABASE
           value: "perpusku_gc"
-        - name: DB_USERNAME
-          value: "root"
         - name: DB_PASSWORD
           value: "root"
         ports:
         - containerPort: 8000
+        command: ["sh", "setup.sh"]
 ---
 apiVersion: v1
 kind: Service
