@@ -1,9 +1,10 @@
-FROM php:7.2
+FROM php:7.2-alpine
 
 WORKDIR /var/www/html
 
-RUN apt-get update && apt-get install -y \
+RUN apk add --no-cache \
         git \
+        curl \
         unzip \
         libzip-dev \
         && docker-php-ext-install zip pdo pdo_mysql
@@ -16,5 +17,3 @@ COPY . .
 RUN composer update
 RUN php artisan key:generate
 RUN chmod a+x setup.sh
-
-
