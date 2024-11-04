@@ -1,17 +1,71 @@
-name: Docker Image CI
+name: Build-Push-Deploy
+env:
+  IMAGE_REPOSITORY: "quay.io/omidiyanto/perpus-laravel"
+  TAGS: "latest"
+  QUAYIO_USER: "omidiyanto"
+  QUAYIO_PASSWORD: ${{ secrets.QUAYIO_PASSWORD }}
+  KUBE_CONFIG: |
+    YXBpVmVyc2lvbjogdjENCmNsdXN0ZXJzOg0KLSBjbHVzdGVyOg0KICAgIHNlcnZlcjogaHR0cHM6
+    Ly9rdWJlYXBpLm9taWRpeWFudG8ubXkuaWQNCiAgbmFtZToga3ViZXJuZXRlcw0KY29udGV4dHM6
+    DQotIGNvbnRleHQ6DQogICAgY2x1c3Rlcjoga3ViZXJuZXRlcw0KICAgIHVzZXI6IG9taWRpeWFu
+    dG8NCiAgbmFtZToga3ViZXJuZXRlcy1hZG1pbkBrdWJlcm5ldGVzDQpjdXJyZW50LWNvbnRleHQ6
+    IGt1YmVybmV0ZXMtYWRtaW5Aa3ViZXJuZXRlcw0Ka2luZDogQ29uZmlnDQpwcmVmZXJlbmNlczog
+    e30NCnVzZXJzOg0KLSBuYW1lOiBvbWlkaXlhbnRvDQogIHVzZXI6DQogICAgdG9rZW46IGV5Smhi
+    R2NpT2lKU1V6STFOaUlzSW10cFpDSTZJakJ3YkcxeVNXTnRNMEkxU21wd2RFbzVibXAyUzIxWlpE
+    SkdXVEZHT0d4RVUycE9kMk5SVEVWa1JXc2lmUS5leUpwYzNNaU9pSnJkV0psY201bGRHVnpMM05s
+    Y25acFkyVmhZMk52ZFc1MElpd2lhM1ZpWlhKdVpYUmxjeTVwYnk5elpYSjJhV05sWVdOamIzVnVk
+    Qzl1WVcxbGMzQmhZMlVpT2lKa1pXWmhkV3gwSWl3aWEzVmlaWEp1WlhSbGN5NXBieTl6WlhKMmFX
+    TmxZV05qYjNWdWRDOXpaV055WlhRdWJtRnRaU0k2SW10MVltVmpiMjVtYVdjdFkyeDFjM1JsY2kx
+    aFpHMXBiaTEwYjJ0bGJpSXNJbXQxWW1WeWJtVjBaWE11YVc4dmMyVnlkbWxqWldGalkyOTFiblF2
+    YzJWeWRtbGpaUzFoWTJOdmRXNTBMbTVoYldVaU9pSnZiV2xrYVhsaGJuUnZJaXdpYTNWaVpYSnVa
+    WFJsY3k1cGJ5OXpaWEoyYVdObFlXTmpiM1Z1ZEM5elpYSjJhV05sTFdGalkyOTFiblF1ZFdsa0lq
+    b2lZamcyTlRoaE9UVXRORGd5WmkwME4yVTRMVGswTW1ZdE9XSTFZak15TWpnME5UbGpJaXdpYzNW
+    aUlqb2ljM2x6ZEdWdE9uTmxjblpwWTJWaFkyTnZkVzUwT21SbFptRjFiSFE2YjIxcFpHbDVZVzUw
+    YnlKOS5oaVd2ZmJfZHdnTTlNSlFESDlLS3NEbkZZQ1AzVHo1WVFSR0MzQU1mUUxQeXlQMHpLR1J6
+    TXl1TXlxMWgzb1BlQ1p1OTdXMVFnQUc2emN1UVMxQllaaEZTSHlIUDR5bUtqd1FhMVhXVGRSb2Mx
+    LWtCZXg0OUR0bDhHVERLRHc0ZnZvRkpBN2N0ZzM0YTk0bjFoemxHcEh1UkhfYWtzR1ZuRldYRXd0
+    THQ3SEQ1QVJjOC1qWWpmVzBkbkxhWW5RUHc1c0tzZ1Uwa0ZEMm1NUTc4R1A1SUdHUjNROWpZVUho
+    ZTNzbWsxZUctaW51MFFKbm5rVGNsMzhleGdkeVIyLTVyazYzdXZDVzEtSDUtWHVfT1pzSmM3X0RY
+    YW9FZDRnRmpMQjN4QXc4OGZFUTFiR2xHTnFZWXl6MmEyRk83cVlDTE5CNXBVQkdBdjA0VzljdDc0
+    cE50UEENCg==
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["master"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["master"]
 
 jobs:
-
-  build:
-
+  build-and-push:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v4
+    - name: Login to Registry
+      run: echo "${{ env.QUAYIO_PASSWORD }}" | docker login quay.io -u ${{ env.QUAYIO_USER }} --password-stdin
+    - name: Build the Docker image
+      run: docker build -t ${{ env.IMAGE_REPOSITORY }}:${{ env.TAGS }} -f Dockerfile-k8s
+    - name: Store Image to Registry
+      run: docker push ${{ env.IMAGE_REPOSITORY }}:${{ env.TAGS }}
 
+# deploy-k8s:
+#   runs-on: ubuntu-latest
+#   needs: build-and-push
+#   steps:
+#   - name: checkout-github-repo
+#     uses: actions/checkout@v4
+#   - name: create kubeconfig
+#     run: |
+#       mkdir -p ${HOME}/.kube
+#       echo ${{ env.KUBE_CONFIG }} | base64 --decode > ${HOME}/.kube/config
+#       cat ${HOME}/.kube/config
+#   - name: Update env variables
+#     run: kubectl set env deployment/frontend-nextjs NEXT_PUBLIC_BACKEND_URL=${{ env.BACKEND_URL }}
+#   - name: Apply k8s yml file for Deployment
+#     run: kubectl apply -f frontend-kubernetes.yml
+#   - name: Access the Endpoint when app ready
+#     run: |
+#       echo "================== Access The App ==================="
+#       echo ""
+#       echo "URL = https://$(kubectl get ingress frontend-nextjs-ingress -o jsonpath='{.spec.rules[0].host}')"
+#       echo ""
+#       echo "====================================================="
