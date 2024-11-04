@@ -33,7 +33,7 @@ jobs:
         mkdir -p ${HOME}/.kube
         echo "${{ env.KUBE_CONFIG }}" | base64 -d > ${HOME}/.kube/config
     - name: kubectl checking
-      run: kubectl --help
+      run: kubectl get nodes
     # - name: Update env variables
 #   run: kubectl set env deployment/frontend-nextjs NEXT_PUBLIC_BACKEND_URL=${{ env.BACKEND_URL }}
 # - name: Apply k8s yml file for Deployment
