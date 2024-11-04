@@ -42,6 +42,6 @@ jobs:
       run: |
         echo "================== Access The App ==================="
         echo ""
-        echo "URL = https://$(kubectl get ingress perpus-laravel-ingress -o jsonpath='{.spec.rules[0].host}')"
+        echo "URL = https://$(kubectl get ingress perpus-laravel -o jsonpath='{.spec.rules[0].host}')"
         echo ""
         echo "====================================================="
