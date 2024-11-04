@@ -34,7 +34,6 @@ jobs:
       run: |
         mkdir -p ${HOME}/.kube
         echo ${{ env.KUBE_CONFIG }} | base64 --decode > ${HOME}/.kube/config
-        cat ${HOME}/.kube/config
     - name: kubectl checking
       run: kubectl --help
     # - name: Update env variables
