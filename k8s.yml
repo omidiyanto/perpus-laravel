@@ -77,7 +77,6 @@ spec:
       labels:
         app: perpus-laravel
     spec:
-      imagePullPolicy: Always
       containers:
       - name: perpus-laravel
         image: quay.io/omidiyanto/perpus-laravel:latest
