@@ -1,3 +1,26 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mysql-data-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+  - ReadWriteOnce
+  hostPath:
+    path: /data/mysql-data # Sesuaikan dengan direktori di node
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-data
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -21,6 +44,13 @@ spec:
           value: perpusku_gc
         ports:
         - containerPort: 3306
+        volumeMounts:
+        - mountPath: /var/lib/mysql/
+          name: mysql-data
+      volumes:
+      - name: mysql-data
+        persistentVolumeClaim:
+          claimName: mysql-data
 ---
 apiVersion: v1
 kind: Service
@@ -32,7 +62,6 @@ spec:
   ports:
   - port: 3306
     targetPort: 3306
-
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -48,7 +77,7 @@ spec:
       labels:
         app: perpus-laravel
     spec:
-      restartPolicy: Always
+      imagePullPolicy: Always
       containers:
       - name: perpus-laravel
         image: quay.io/omidiyanto/perpus-laravel:latest
@@ -66,7 +95,7 @@ spec:
           value: "root"
         ports:
         - containerPort: 8000
-        command: ["sh", "setup.sh"]
+        command: [ "sh", "setup.sh" ]
 ---
 apiVersion: v1
 kind: Service
@@ -97,5 +126,3 @@ spec:
             name: perpus-laravel
             port:
               number: 8000
-
-
