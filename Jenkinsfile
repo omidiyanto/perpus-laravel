@@ -68,6 +68,11 @@ pipeline {
                 }
             }
         }
+        stage("Remove container images for free space"){
+            steps{
+                sh "docker rmi -f ${env.REPOSITORY}/${env.APP_NAME}:${env.IMAGE_TAG}"
+            }
+        }
     }
     post {
         always {
