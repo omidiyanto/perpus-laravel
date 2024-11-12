@@ -28,7 +28,7 @@ pipeline {
                     sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=Perpus-laravel \
                     -Dsonar.projectKey=Perpus-laravel '''
                 }
-                sh 'sleep 5'
+                sh 'sleep 10'
             }
         }
         stage("Quality Gate") {
