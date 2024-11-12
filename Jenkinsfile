@@ -28,6 +28,14 @@ pipeline {
                     sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=Perpus-laravel \
                     -Dsonar.projectKey=Perpus-laravel '''
                 }
+                sh 'sleep 5'
+            }
+        }
+        stage("Quality Gate") {
+            steps {
+                script {
+                    waitForQualityGate abortPipeline: false, credentialsId: 'sonar-token'
+                }
             }
         }
         stage('TRIVY FS SCAN') {
@@ -70,6 +78,7 @@ pipeline {
                 to: 'midiyanto26@gmail.com',
                 attachmentsPattern: 'trivyfs.txt,trivyimage.txt'
             )
+            cleanWs()
         }
     }
 }
