@@ -115,7 +115,7 @@ metadata:
     name: perpus-laravel
 spec:
   rules:
-  - host: perpus-laravel.omidiyanto.my.id
+  - host: perpus-laravel2.omidiyanto.my.id
     http:
       paths:
       - pathType: Prefix
