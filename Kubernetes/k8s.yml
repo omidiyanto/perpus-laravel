@@ -8,7 +8,7 @@ spec:
   accessModes:
   - ReadWriteOnce
   hostPath:
-    path: /data/mysql-data # Sesuaikan dengan direktori di node
+    path: /data/mysql-data # Sesuaikan dengan direktori di nod
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
